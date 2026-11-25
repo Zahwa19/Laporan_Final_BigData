@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="id" class="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <title>PT. Maysura Berkah Sejahtera - Dashboard Peternak</title>
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              primary: '#84532b',
+              hover: '#6e4321',
+              light: '#fef3c7'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="assets/css/style.css?v=2.1">
+</head>
+<body class="bg-[#FAF8F5] text-slate-800 min-h-screen antialiased">
+
+  <!-- ======================================================== -->
+  <!-- 1. PORTAL LOGIN (HANYA MUNCUL JIKA BELUM LOGIN) -->
+  <!-- ======================================================== -->
+  <section id="portalLoginView" class="min-h-screen flex items-center justify-center p-4 bg-[#FAF8F5]">
+    <div class="max-w-sm w-full bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200 space-y-6">
+      
+      <!-- Brand & Monogram MBS -->
+      <div class="text-center space-y-3">
+        <div class="w-12 h-12 rounded-xl bg-[#78350F] text-white font-extrabold text-base flex items-center justify-center tracking-wider mx-auto shadow-xs">
+          MBS
+        </div>
+        <h1 class="text-base sm:text-lg font-bold text-slate-900 leading-tight">
+          PT. Maysura Berkah Sejahtera
+        </h1>
+      </div>
+
+      <!-- Form Login -->
+      <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4 text-xs">
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1.5">Username</label>
+          <input type="text" id="loginUsername" value="Peternak Mitra (Armi A.)" readonly class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-700 font-medium cursor-not-allowed outline-none">
+        </div>
+
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1.5">Password</label>
+          <input type="password" id="loginPassword" value="mbs2026" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-900 font-medium focus:ring-2 focus:ring-[#84532b] focus:border-[#84532b] outline-none">
+        </div>
+
+        <button type="submit" class="w-full py-2.5 rounded-xl bg-[#84532b] hover:bg-[#6e4321] text-white font-bold text-xs shadow-xs transition flex items-center justify-center">
+          Login
+        </button>
+      </form>
+
+    </div>
+  </section>
+
+  <!-- ======================================================== -->
+  <!-- 2. LAYOUT UTAMA DASHBOARD (TERBUNGKUS RAPI DI MAINAPPLAYOUT) -->
+  <!-- ======================================================== -->
+  <div id="mainAppLayout" class="hidden min-h-screen flex flex-col md:flex-row">
+
+    <!-- SIDEBAR KIRI (HANYA 2 MENU UTAMA) -->
+    <aside id="sidebarNav" class="w-full md:w-64 bg-white border-r border-slate-200 md:min-h-screen md:sticky md:top-0 md:h-screen md:overflow-y-auto z-40 flex flex-col justify-between shrink-0 no-print transition-all">
+      
+      <div>
+        <!-- Bagian Atas: Monogram MBS + Nama -->
+        <div class="p-5 border-b border-slate-200 flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-[#78350F] flex items-center justify-center text-white font-extrabold text-sm tracking-wider shadow-sm shrink-0">
+            MBS
+          </div>
+          <div class="space-y-0.5">
+            <h2 class="text-sm font-bold text-slate-900 leading-tight">
+              PT. MBS Broiler
+            </h2>
+            <div class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200 tracking-wide uppercase">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
+              <span>PETERNAK MITRA</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2 Menu Utama -->
+        <nav class="p-3.5 space-y-1.5 text-xs font-semibold" id="sidebarMenuList">
+          
+          <!-- Menu 1: Dashboard Utama -->
+          <button onclick="switchView('dashboard')" id="nav-btn-dashboard" class="sidebar-nav-btn sidebar-item-active w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition text-xs font-bold">
+            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+            <span>Dashboard Utama</span>
+          </button>
+
+          <!-- Menu 2: Pencatatan Harian -->
+          <button onclick="switchView('input')" id="nav-btn-input" class="sidebar-nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-700 hover:bg-slate-100 transition text-xs font-semibold">
+            <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+            <span>Pencatatan Harian</span>
+          </button>
+
+        </nav>
+      </div>
+
+      <!-- Tombol Keluar di Bawah Sidebar -->
+      <div class="p-3.5 border-t border-slate-200">
+        <button onclick="handleLogout()" class="w-full py-2.5 px-3 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-600 text-xs font-semibold flex items-center justify-center gap-2 transition">
+          <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+          <span>Keluar Portal</span>
+        </button>
+      </div>
+
+    </aside>
+
+    <!-- KONTEN AREA KANAN SIDEBAR (LEBAR PENUH & ANTI-COLLAPSE) -->
+    <div class="main-content-wrapper flex-1 min-w-0 flex flex-col bg-[#FAF8F5]">
+
+      <main class="flex-1 p-4 sm:p-6 lg:p-8 space-y-6">
+
+        <!-- ======================================================== -->
+        <!-- FILTER GLOBAL: DROPDOWN PERIODE & MINGGU & CETAK -->
+        <!-- ======================================================== -->
+        <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4 no-print">
+          <div class="flex flex-wrap items-center gap-3">
+            <div class="flex items-center gap-2 text-xs font-bold text-slate-800">
+              <svg class="w-4 h-4 text-[#84532b]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>
+              <span>FILTER GLOBAL:</span>
+            </div>
+            
+            <!-- Dropdown Periode -->
+            <div class="relative">
+              <select id="globalFilterPeriode" onchange="handleGlobalFilterChange()" class="text-xs font-semibold px-3 py-2 rounded-xl border border-slate-200 bg-white text-slate-800 focus:ring-2 focus:ring-[#84532b] outline-none cursor-pointer">
+                <option value="p4" selected>Periode 4 (Aktif Berjalan - Nov 2026)</option>
+                <option value="p1">Periode 1 (Selesai Panen - Sangat Baik)</option>
+                <option value="p2">Periode 2 (Selesai Panen - Performa Standar)</option>
+                <option value="p3">Periode 3 (Selesai Panen - Terdampak Cuaca Panas)</option>
+                <option value="all">Semua Periode (Komparasi)</option>
+              </select>
+            </div>
+
+            <!-- Dropdown Filter Minggu -->
+            <div class="relative">
+              <select id="globalFilterWeek" onchange="handleGlobalFilterChange()" class="text-xs font-semibold px-3 py-2 rounded-xl border border-slate-200 bg-white text-slate-800 focus:ring-2 focus:ring-[#84532b] outline-none cursor-pointer">
+                <option value="0">Semua Minggu (Hari 1–42)</option>
+                <option value="1">Minggu 1 (Hari 1–7) · Fase Brooding</option>
+                <option value="2">Minggu 2 (Hari 8–14) · Fase Starter</option>
+                <option value="3">Minggu 3 (Hari 15–21) · Fase Grower Awal</option>
+                <option value="4">Minggu 4 (Hari 22–28) · Fase Grower Lanjut</option>
+                <option value="5">Minggu 5 (Hari 29–35) · Fase Finisher</option>
+                <option value="6">Minggu 6 (Hari 36–42) · Fase Panen Akhir</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Tombol Cetak Laporan -->
+          <div class="flex items-center">
+            <button onclick="window.print()" class="px-3.5 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-xs font-semibold text-slate-700 flex items-center gap-1.5 transition shadow-xs">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+              <span>Cetak Laporan</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- ======================================================== -->
+        <!-- VIEW 1: DASHBOARD UTAMA (25 GRAFIK + PREDIKSI PANEN) -->
+        <!-- ======================================================== -->
+        <section id="view-dashboard" class="content-view space-y-6">
+
+          <!-- 5 KARTU KPI UTAMA SEJAJAR (GRID 5 KOLOM) -->
+          <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
+            
+            <!-- 1. Ayam Hidup -->
+            <div class="kpi-card flex flex-col justify-between">
+              <div class="flex justify-between items-center text-xs text-slate-500 font-semibold">
+                <span>Ayam Hidup</span>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800" id="cardBadge-ayam">✓ Baik</span>
+              </div>
+              <div class="my-2 text-2xl xl:text-3xl font-extrabold text-slate-900" id="cardVal-ayam">
+                2.454 <span class="text-xs font-normal text-slate-500">ekor</span>
+              </div>
+              <p class="text-xs text-slate-500" id="cardSub-ayam">46 mati · 98,2% Livability</p>
+            </div>
+
+            <!-- 2. Berat Ayam -->
+            <div class="kpi-card flex flex-col justify-between">
+              <div class="flex justify-between items-center text-xs text-slate-500 font-semibold">
+                <span>Bobot Sampling</span>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800" id="cardBadge-berat">✓ Target</span>
+              </div>
+              <div class="my-2 text-2xl xl:text-3xl font-extrabold text-slate-900" id="cardVal-berat">
+                241 <span class="text-xs font-normal text-slate-500">gram</span>
+              </div>
+              <p class="text-xs text-slate-500" id="cardSub-berat">Standar: 242 g (-1 g · 99,6%)</p>
+            </div>
+
+            <!-- 3. Efisiensi Pakan (FCR) -->
+            <div class="kpi-card flex flex-col justify-between">
+              <div class="flex justify-between items-center text-xs text-slate-500 font-semibold">
+                <span>Efisiensi Pakan (FCR)</span>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800" id="cardBadge-fcr">✓ Sangat Efisien</span>
+              </div>
+              <div class="my-2 text-2xl xl:text-3xl font-extrabold text-slate-900" id="cardVal-fcr">
+                0,67* <span class="text-xs font-normal text-slate-500">FCR</span>
+              </div>
+              <p class="text-xs text-slate-500" id="cardSub-fcr">Standar: 0,88 (Hemat 0,21 poin)</p>
+            </div>
+
+            <!-- 4. Stok Pakan -->
+            <div class="kpi-card flex flex-col justify-between">
+              <div class="flex justify-between items-center text-xs text-slate-500 font-semibold">
+                <span>Stok Pakan Sisa</span>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800" id="cardBadge-stok">✓ Aman</span>
+              </div>
+              <div class="my-2 text-2xl xl:text-3xl font-extrabold text-slate-900" id="cardVal-stok">
+                10 <span class="text-xs font-normal text-slate-500">sak</span>
+              </div>
+              <p class="text-xs text-slate-500" id="cardSub-stok">500 kg · Cukup ~5,0 hari</p>
+            </div>
+
+            <!-- 5. Data Eksternal Cuaca & Heat Stress (Marawola) -->
+            <div class="kpi-card flex flex-col justify-between">
+              <div class="flex justify-between items-center text-xs text-slate-500 font-semibold">
+                <span>Cuaca & Heat Stress</span>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">✓ Risiko Rendah</span>
+              </div>
+              <div class="my-2 text-2xl xl:text-3xl font-extrabold text-slate-900" id="cardVal-cuaca">
+                29,4°C <span class="text-xs font-normal text-slate-500">/ 76% RH</span>
+              </div>
+              <p class="text-xs text-slate-500" id="cardSub-cuaca">Marawola, Sigi · THI 79,2 (Aman Brooding)</p>
+            </div>
+
+          </div>
+
+          <!-- ======================================================== -->
+          <!-- NAVIGASI TAB KATEGORI 25 GRAFIK (TAB SWITCHER)           -->
+          <!-- ======================================================== -->
+          <div id="chartCategoryTabsBar" class="bg-white border border-slate-200 rounded-2xl p-3 sm:p-4 shadow-xs no-print">
+            <!-- Deretan 6 Pill Tabs -->
+            <div class="flex flex-wrap gap-2 text-xs">
+              <button id="tab-btn-bobot" onclick="switchChartTab('bobot')" class="chart-tab-btn active-tab">
+                Bobot
+              </button>
+              <button id="tab-btn-pakan" onclick="switchChartTab('pakan')" class="chart-tab-btn">
+                Pakan & FCR
+              </button>
+              <button id="tab-btn-kesehatan" onclick="switchChartTab('kesehatan')" class="chart-tab-btn">
+                Mortalitas
+              </button>
+              <button id="tab-btn-stok" onclick="switchChartTab('stok')" class="chart-tab-btn">
+                Stok Gudang
+              </button>
+              <button id="tab-btn-panen" onclick="switchChartTab('panen')" class="chart-tab-btn">
+                Panen ML
+              </button>
+              <button id="tab-btn-siklus" onclick="switchChartTab('siklus')" class="chart-tab-btn">
+                Siklus
+              </button>
+            </div>
+          </div>
+
+          <!-- ======================================================== -->
+          <!-- PANEL TAB 1: BOBOT (5 GRAFIK)                           -->
+          <!-- ======================================================== -->
+          <div id="tab-panel-bobot" class="tab-panel pt-2 space-y-4">
+            <div class="border-b border-slate-200 pb-2">
+              <h3 class="text-sm font-bold text-slate-900">
+                Analisis Pertumbuhan Bobot Badan & Keseragaman Flock
+              </h3>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            
+            <!-- Chart 1 -->
+            <div class="bg-white  p-5 rounded-2xl border border-slate-200  shadow-xs space-y-3 flex flex-col justify-between">
+              <div>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-brand-100 text-brand-800  ">Grafik #01 · Line & Scatter Chart</span>
+                <h4 class="text-xs sm:text-sm font-bold text-slate-900  mt-1">1. Kurva Bobot Nyata vs Standar PT MBS</h4>
+                <p class="text-[11px] text-slate-500">Titik hijau adalah hasil timbang riil di kandang; garis abu-abu adalah target acuan MB-JAPFA.</p>
+              </div>
+              <div class="h-64 sm:h-72 w-full"><canvas id="c1_growth"></canvas></div>
+              <div class="pt-2.5 border-t border-slate-100  insight-box">
+                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-extrabold uppercase bg-amber-200/80 text-amber-900   shrink-0">Insight</span>
+                <span class="text-slate-700  font-medium leading-relaxed" id="insight_c1">Bobot nyata hari ke-8 (241g) mencapai 99,6% standar MBS (242g), deviasi sangat minimal -1 gram.</span>
+              </div>
+            </div>
+
+            <!-- Chart 2 -->
+            <div class="bg-white  p-5 rounded-2xl border border-slate-200  shadow-xs space-y-3 flex flex-col justify-between">
+              <div>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-brand-100 text-brand-800  ">Grafik #02 · Bar & Line Combo Chart</span>
+                <h4 class="text-xs sm:text-sm font-bold text-slate-900  mt-1">2. Pertambahan Bobot Harian (ADG)</h4>
+                <p class="text-[11px] text-slate-500">Mengukur berapa gram ayam bertambah besar setiap hari di fase awal (saat ini 32,5 g/hari).</p>
+              </div>
+              <div class="h-64 sm:h-72 w-full"><canvas id="c2_adg"></canvas></div>
+              <div class="pt-2.5 border-t border-slate-100  insight-box">
+                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-extrabold uppercase bg-amber-200/80 text-amber-900   shrink-0">Insight</span>
+                <span class="text-slate-700  font-medium leading-relaxed" id="insight_c2">Laju pertumbuhan harian (ADG) meningkat pesat dari 17,0 g/hari di H-1 menjadi 32,5 g/hari di H-8.</span>
+              </div>
+            </div>
+
+            <!-- Chart 3 -->
+            <div class="bg-white  p-5 rounded-2xl border border-slate-200  shadow-xs space-y-3 flex flex-col justify-between">
+              <div>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-brand-100 text-brand-800  ">Grafik #03 · Diverging Bar Chart</span>
+                <h4 class="text-xs sm:text-sm font-bold text-slate-900  mt-1">3. Deviasi / Selisih Bobot Terhadap Target (Gram)</h4>
+                <p class="text-[11px] text-slate-500">Menunjukkan rasio bobot timbang nyata terhadap target standar PT. MBS.</p>
+              </div>
+              <div class="h-64 sm:h-72 w-full"><canvas id="c3_pctGrowth"></canvas></div>
+              <div class="pt-2.5 border-t border-slate-100  insight-box">
+                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-extrabold uppercase bg-amber-200/80 text-amber-900   shrink-0">Insight</span>
+                <span class="text-slate-700  font-medium leading-relaxed" id="insight_c3">Persentase capaian target stabil di atas 95%–100%, menandakan kondisi flock ayam sehat dan nafsu makan baik.</span>
+              </div>
+            </div>
+
+            <!-- Chart 4 -->
+            <div class="bg-white  p-5 rounded-2xl border border-slate-200  shadow-xs space-y-3 flex flex-col justify-between">
+              <div>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-brand-100 text-brand-800  ">Grafik #04 · Area Chart (Filled Line)</span>
+                <h4 class="text-xs sm:text-sm font-bold text-slate-900  mt-1">4. Laju Pertumbuhan Bobot Kumulatif per Fase</h4>
+                <p class="text-[11px] text-slate-500">Evaluasi capaian bobot tiap 7 hari (M1: 200g, M2: 500g, s/d M6: 2.625g).</p>
+              </div>
+              <div class="h-64 sm:h-72 w-full"><canvas id="c4_weeklyBw"></canvas></div>
+              <div class="pt-2.5 border-t border-slate-100  insight-box">
+                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-extrabold uppercase bg-amber-200/80 text-amber-900   shrink-0">Insight</span>
+                <span class="text-slate-700  font-medium leading-relaxed" id="insight_c4">Target Minggu 1 (200g) sukses terlampaui; target Minggu 2 (500g) diproyeksikan tercapai tepat waktu pada H-14.</span>
+              </div>
+            </div>
+
+            <!-- Chart 5 -->
+            <div class="bg-white  p-5 rounded-2xl border border-slate-200  shadow-xs space-y-3 flex flex-col justify-between">
+              <div>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-brand-100 text-brand-800  ">Grafik #05 · Grouped Bar Chart</span>
+                <h4 class="text-xs sm:text-sm font-bold text-slate-900  mt-1">5. Perbandingan Bobot Titik Kritis Mingguan (H7–H42)</h4>
+                <p class="text-[11px] text-slate-500">Mengukur apakah ukuran ayam seragam atau ada yang tertinggal.</p>
+              </div>
+              <div class="h-64 sm:h-72 w-full flex items-center justify-center"><canvas id="c5_uniformity"></canvas></div>
+              <div class="pt-2.5 border-t border-slate-100  insight-box">
+                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-extrabold uppercase bg-amber-200/80 text-amber-900   shrink-0">Insight</span>
+                <span class="text-slate-700  font-medium leading-relaxed" id="insight_c5">Tingkat keseragaman mencapai 88% (Kategori Sangat Baik), memudahkan manajemen pemeliharaan flock.</span>
+              </div>
+            </div>
+
+            <!-- Companion Card: Analisis Statistik Keseragaman -->
+            <div class="bg-white  p-5 rounded-2xl border border-slate-200  shadow-xs space-y-4 flex flex-col justify-between">
+              <div>
+                <div class="flex items-center justify-between">
+                  <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-100 text-blue-800  ">Statistical Analysis</span>
+                  <span class="text-xs font-bold text-emerald-600">CV = 8,4% (Baik)</span>
+                </div>
+                <h4 class="text-sm font-bold text-slate-900  mt-2">Evaluasi Distribusi Bobot & Rekomendasi PPL</h4>
+                <p class="text-xs text-slate-500 mt-1 leading-relaxed">
+                  Berdasarkan sampling 50 ekor pada hari ke-8, koefisien variasi (CV) sebesar 8,4% berada dalam rentang ideal (&lt;10%). Hal ini menunjukkan ketersediaan tempat pakan dan pemanas saat brooding merata.
+                </p>
+              </div>
+              <div class="grid grid-cols-2 gap-3 text-xs bg-slate-50 dark:bg-slate-800/50 p-3.5 rounded-xl">
+                <div>
+                  <div class="text-slate-400">Rentang Bobot:</div>
+                  <div class="font-bold text-slate-800 ">225 g – 255 g</div>
+                </div>
+                <div>
+                  <div class="text-slate-400">Standar Deviasi:</div>
+                  <div class="font-bold text-slate-800 ">±20,2 gram</div>
+                </div>
+              </div>
+              <div class="pt-2.5 border-t border-slate-100  bg-emerald-50/70 /30 rounded-xl px-3 py-2 flex items-start gap-2 text-xs">
+                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-extrabold uppercase bg-emerald-200 text-emerald-900 dark:bg-emerald-900 dark:text-emerald-200 shrink-0">Saran PPL</span>
+                <span class="text-slate-700  font-medium">Pertahankan kerapatan sekat kandang dan sebaran tempat minum (bell drinker) agar keseragaman tetap terjaga di atas 85%.</span>
+              </div>
+            </div>
+
+          </div>
+          </div>
+
+          <!-- ======================================================== -->
+          <!-- PANEL TAB 2: PAKAN & FCR (5 GRAFIK)                      -->
+          <!-- ======================================================== -->
+          <div id="tab-panel-pakan" class="tab-panel hidden pt-2 space-y-4">
+            <div class="border-b border-slate-200 pb-2">
+              <h3 class="text-sm font-bold text-slate-900">
+                Efisiensi Konsumsi Pakan & Konversi FCR
+              </h3>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            
+            <!-- Chart 6 -->
+            <div class="bg-white  p-5 rounded-2xl border border-slate-200  shadow-xs space-y-3 flex flex-col justify-between">
+              <div>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300">Grafik #06 · Dual-Line Chart</span>
+                <h4 class="text-xs sm:text-sm font-bold text-slate-900  mt-1">6. Konsumsi Pakan Harian (Sak)</h4>
+                <p class="text-[11px] text-slate-500">Batang hijau adalah pakan riil yang diberikan; abu-abu adalah jatah standar PT. MBS.</p>
+              </div>
+              <div class="h-64 sm:h-72 w-full"><canvas id="c6_dailyFeed"></canvas></div>
+              <div class="pt-2.5 border-t border-slate-100  insight-box">
+                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-extrabold uppercase bg-amber-200/80 text-amber-900   shrink-0">Insight</span>
+                <span class="text-slate-700  font-medium leading-relaxed" id="insight_c6">Pemberian pakan harian (1,0–2,0 sak) terkontrol efisien tanpa ada indikasi pakan terbuang (spillage).</span>
+              </div>
+            </div>
+
+            <!-- Chart 7 -->
+            <div class="bg-white  p-5 rounded-2xl border border-slate-200  shadow-xs space-y-3 flex flex-col justify-between">
+              <div>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300">Grafik #07 · Stacked Bar Chart</span>
+                <h4 class="text-xs sm:text-sm font-bold text-slate-900  mt-1">7. Konsumsi per Ekor per Hari (Gram)</h4>
+                <p class="text-[11px] text-slate-500">Jatah makan satu ekor ayam dalam gram per hari (dibandingkan standar rekomendasi).</p>
+              </div>
+              <div class="h-64 sm:h-72 w-full"><canvas id="c7_perBirdFeed"></canvas></div>
+              <div class="pt-2.5 border-t border-slate-100  insight-box">
+                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-extrabold uppercase bg-amber-200/80 text-amber-900   shrink-0">Insight</span>
+                <span class="text-slate-700  font-medium leading-relaxed" id="insight_c7">Konsumsi pakan per ekor di hari ke-8 adalah 40,7 g vs standar 42,0 g (efisien hemat 1,3 g/ekor/hari).</span>
+              </div>
+            </div>
+
+            <!-- Chart 8 -->
+            <div class="bg-white  p-5 rounded-2xl border border-slate-200  shadow-xs space-y-3 flex flex-col justify-between">
+              <div>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300">Grafik #08 · Stepped Line Chart</span>
+                <h4 class="text-xs sm:text-sm font-bold text-slate-900  mt-1">8. Pakan Kumulatif (Kilogram)</h4>
+                <p class="text-[11px] text-slate-500">Total berat pakan yang telah dihabiskan sejak hari pertama (1 sak = 50 kg).</p>
+              </div>
+              <div class="h-64 sm:h-72 w-full"><canvas id="c8_cumFeed"></canvas></div>
+              <div class="pt-2.5 border-t border-slate-100  insight-box">
+                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-extrabold uppercase bg-amber-200/80 text-amber-900   shrink-0">Insight</span>
+                <span class="text-slate-700  font-medium leading-relaxed" id="insight_c8">Pakan kumulatif hingga hari ke-8 terpakai 475 kg (9,5 sak), hemat 135 kg dibanding kuota standar MBS (610 kg).</span>
+              </div>
+            </div>
+
+            <!-- Chart 9 -->
+            <div class="bg-white  p-5 rounded-2xl border border-slate-200  shadow-xs space-y-3 flex flex-col justify-between">
+              <div>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300">Grafik #09 · Horizontal Bar Chart</span>
+                <h4 class="text-xs sm:text-sm font-bold text-slate-900  mt-1">9. FCR Aktual vs Standar PT MBS</h4>
+                <p class="text-[11px] text-slate-500">Angka efisiensi konversi pakan; semakin kecil nilainya menandakan semakin hemat.</p>
+              </div>
+              <div class="h-64 sm:h-72 w-full"><canvas id="c9_fcr"></canvas></div>
+              <div class="pt-2.5 border-t border-slate-100  insight-box">
+                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-extrabold uppercase bg-amber-200/80 text-amber-900   shrink-0">Insight</span>
+                <span class="text-slate-700  font-medium leading-relaxed" id="insight_c9">FCR aktual 0,67 jauh di bawah batas standar 0,88 (tercatat hemat 0,21 poin di fase starter).</span>
+              </div>
+            </div>
+
+            <!-- Chart 10 -->
+            <div class="bg-white  p-5 rounded-2xl border border-slate-200  shadow-xs space-y-3 flex flex-col justify-between">
+              <div>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300">Grafik #10 · Scatter Plot (Korelasi)</span>
+                <h4 class="text-xs sm:text-sm font-bold text-slate-900  mt-1">10. Selisih Efisiensi Pakan (Diff FCR)</h4>
+                <p class="text-[11px] text-slate-500">Nilai negatif (batang hijau) artinya lebih hemat; positif (merah) artinya lebih boros.</p>
+              </div>
+              <div class="h-64 sm:h-72 w-full"><canvas id="c10_diffFcr"></canvas></div>
+              <div class="pt-2.5 border-t border-slate-100  insight-box">
+                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-extrabold uppercase bg-amber-200/80 text-amber-900   shrink-0">Insight</span>
+                <span class="text-slate-700  font-medium leading-relaxed" id="insight_c10">Nilai Diff FCR konsisten negatif (-0,21), mengindikasikan efisiensi metabolisme pakan sangat baik.</span>
+              </div>
+            </div>
+
+            <!-- Companion Card: Kalkulator Penghematan Finansial Pakan -->
+            <div class="bg-white  p-5 rounded-2xl border border-slate-200  shadow-xs space-y-4 flex flex-col justify-between">
+              <div>
+                <div class="flex items-center justify-between">
+                  <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-100 text-emerald-800  ">Financial Impact</span>
+                  <span class="text-xs font-bold text-emerald-600">Total Penghematan: Rp 1.485.000</span>
+                </div>
+                <h4 class="text-sm font-bold text-slate-900  mt-2">Dampak Ekonomi Efisiensi Pakan</h4>
+                <p class="text-xs text-slate-500 mt-1 leading-relaxed">
+                  Dengan harga pakan Rp 550.000 / sak (Rp 11.000 / kg), penghematan 2,7 sak (135 kg) di 8 hari pertama telah menekan biaya operasional mitra sebesar Rp 1.485.000.
+                </p>
+              </div>
+              <div class="grid grid-cols-2 gap-3 text-xs bg-slate-50 dark:bg-slate-800/50 p-3.5 rounded-xl">
+                <div>
+                  <div class="text-slate-400">Pakan Standar MBS:</div>
+                  <div class="font-bold text-slate-800 ">12,2 Sak (Rp 6.710.000)</div>
+                </div>
+                <div>
+                  <div class="text-slate-400">Pakan Aktual Terpakai:</div>
+                  <div class="font-bold text-emerald-600">9,5 Sak (Rp 5.225.000)</div>
+                </div>
+              </div>
+              <div class="pt-2.5 border-t border-slate-100  insight-box">
+                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-extrabold uppercase bg-amber-200/80 text-amber-900   shrink-0">Rekomendasi</span>
+                <span class="text-slate-700  font-medium">Pertahankan jadwal pemberian pakan 3x sehari (pagi, siang, malam) untuk memaksimalkan retensi nutrisi.</span>
+              </div>
+            </div>
+
+          </div>
+          </div>
+
+          <!-- ======================================================== -->
+          <!-- PANEL TAB 3: MORTALITAS (5 GRAFIK)                       -->
+          <!-- ======================================================== -->
+          <div id="tab-panel-kesehatan" class="tab-panel hidden pt-2 space-y-4">
+            <div class="border-b border-slate-200 pb-2">
+              <h3 class="text-sm font-bold text-slate-900">
+                Mortalitas, Deplesi Kumulatif & Populasi Ayam
+              </h3>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            
+            <!-- Chart 11 -->
+            <div class="bg-white  p-5 rounded-2xl border border-slate-200  shadow-xs space-y-3 flex flex-col justify-between">
+              <div>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-rose-100 text-rose-800  ">Grafik #11 · Mixed Bar & Line Chart</span>
+                <h4 class="text-xs sm:text-sm font-bold text-slate-900  mt-1">11. Ayam Mati Harian (Ekor) vs Persentase Deplesi (%)</h4>
+                <p class="text-[11px] text-slate-500">Jumlah ayam mati tiap hari; normal jika di awal tinggi karena masa adaptasi (chick-in).</p>
+              </div>
+              <div class="h-64 sm:h-72 w-full"><canvas id="c11_dailyDeath"></canvas></div>
+              <div class="pt-2.5 border-t border-slate-100  insight-box">
+                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-extrabold uppercase bg-amber-200/80 text-amber-900   shrink-0">Insight</span>
+                <span class="text-slate-700  font-medium leading-relaxed" id="insight_c11">Kematian tertinggi terjadi pada hari pertama (16 ekor karena stres perjalanan DOC), kemudian melandai tajam ke 2 ekor/hari.</span>
+              </div>
+            </div>
+
+            <!-- Chart 12 -->
+            <div class="bg-white  p-5 rounded-2xl border border-slate-200  shadow-xs space-y-3 flex flex-col justify-between">
+              <div>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-rose-100 text-rose-800  ">Grafik #12 · Doughnut Chart</span>
+                <h4 class="text-xs sm:text-sm font-bold text-slate-900  mt-1">12. Deplesi Kumulatif vs Batas Aman (%)</h4>
+                <p class="text-[11px] text-slate-500">Persentase total ayam mati sejak awal; batas aman standar kemitraan adalah &lt;4%.</p>
+              </div>
+              <div class="h-64 sm:h-72 w-full"><canvas id="c12_depletion"></canvas></div>
+              <div class="pt-2.5 border-t border-slate-100  insight-box">
+                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-extrabold uppercase bg-amber-200/80 text-amber-900   shrink-0">Insight</span>
+                <span class="text-slate-700  font-medium leading-relaxed" id="insight_c12">Deplesi kumulatif hari ke-8 sebesar 1,84% (46 ekor), sangat aman di bawah ambang batas toleransi merah kemitraan (4,0%).</span>
+              </div>
+            </div>
+
+            <!-- Chart 13 -->
+            <div class="bg-white  p-5 rounded-2xl border border-slate-200  shadow-xs space-y-3 flex flex-col justify-between">
+              <div>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-rose-100 text-rose-800  ">Grafik #13 · Area Spline Chart</span>
+                <h4 class="text-xs sm:text-sm font-bold text-slate-900  mt-1">13. Populasi Ayam Bertahan Hidup</h4>
+                <p class="text-[11px] text-slate-500">Jumlah ayam yang masih hidup dan aktif di kandang (populasi awal: 2.500 ekor).</p>
+              </div>
+              <div class="h-64 sm:h-72 w-full"><canvas id="c13_liveBirds"></canvas></div>
+              <div class="pt-2.5 border-t border-slate-100  insight-box">
+                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-extrabold uppercase bg-amber-200/80 text-amber-900   shrink-0">Insight</span>
+                <span class="text-slate-700  font-medium leading-relaxed" id="insight_c13">Populasi aktif bertahan di 2.454 ekor (98,16%), menjaga potensi biomassa panen tetap optimal.</span>
+              </div>
+            </div>
+
+            <!-- Chart 14 -->
+            <div class="bg-white  p-5 rounded-2xl border border-slate-200  shadow-xs space-y-3 flex flex-col justify-between">
+              <div>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-rose-100 text-rose-800  ">Grafik #14 · Multi-Axis Line Chart</span>
+                <h4 class="text-xs sm:text-sm font-bold text-slate-900  mt-1">14. Tingkat Kelangsungan Hidup (Livability %)</h4>
+                <p class="text-[11px] text-slate-500">Persentase ayam yang bertahan hidup dibanding total DOC awal yang dimasukkan.</p>
+              </div>
+              <div class="h-64 sm:h-72 w-full flex items-center justify-center"><canvas id="c14_survival"></canvas></div>
+              <div class="pt-2.5 border-t border-slate-100  insight-box">
+                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-extrabold uppercase bg-amber-200/80 text-amber-900   shrink-0">Insight</span>
+                <span class="text-slate-700  font-medium leading-relaxed" id="insight_c14">Tingkat kelangsungan hidup 98,16% mencerminkan sanitasi kandang dan biosecurity peternakan Marawola berjalan baik.</span>
+              </div>
+            </div>
+
+            <!-- Chart 15 -->
+            <div class="bg-white  p-5 rounded-2xl border border-slate-200  shadow-xs space-y-3 flex flex-col justify-between">
+              <div>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-rose-100 text-rose-800  ">Grafik #15 · Polar Area Chart</span>
+                <h4 class="text-xs sm:text-sm font-bold text-slate-900  mt-1">15. Komposisi Kematian Alami vs Culling</h4>
+                <p class="text-[11px] text-slate-500">Perbandingan antara ayam mati alami dengan ayam yang diafkir (culling/cacat).</p>
+              </div>
+              <div class="h-64 sm:h-72 w-full flex items-center justify-center"><canvas id="c15_culling"></canvas></div>
+              <div class="pt-2.5 border-t border-slate-100  insight-box">
+                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-extrabold uppercase bg-amber-200/80 text-amber-900   shrink-0">Insight</span>
+                <span class="text-slate-700  font-medium leading-relaxed" id="insight_c15">100% mortalitas adalah kematian alami chick-in awal, belum tercatat adanya ayam cacat atau afkir seleksi (Culling: 0 ekor).</span>
+              </div>
+            </div>
+
+            <!-- Companion Card: Jadwal Vaksinasi & Program OVK -->
+            <div class="bg-white  p-5 rounded-2xl border border-slate-200  shadow-xs space-y-4 flex flex-col justify-between">
+              <div>
+                <div class="flex items-center justify-between">
+                  <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-purple-100 text-purple-800  ">Program OVK & Vaksinasi</span>
+                  <span class="text-xs font-bold text-blue-600">Terjadwal Hari ke-14</span>
+                </div>
+                <h4 class="text-sm font-bold text-slate-900  mt-2">Monitoring Vaksinasi & Vitamin Harian</h4>
+                <p class="text-xs text-slate-500 mt-1 leading-relaxed">
+                  Program OVK tercatat: Hari ke-1 Super Elektrolit; Hari 3–6 Cypro / Megavit; Hari ke-7 Air putih (istirahat OVK).
+                </p>
+              </div>
+              <div class="space-y-2 text-xs bg-slate-50 dark:bg-slate-800/50 p-3.5 rounded-xl">
+                <div class="flex items-center justify-between">
+                  <span>Vaksin ND-IB (Caprivac):</span>
+                  <span class="font-bold text-emerald-600">✓ Selesai di Hatchery / H-1</span>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span>Vaksin Gumboro (Medivac):</span>
+                  <span class="font-bold text-amber-600">⏳ Terjadwal Hari ke-14 via Air Minum</span>
+                </div>
+              </div>
+              <div class="pt-2.5 border-t border-slate-100  bg-emerald-50/70 /30 rounded-xl px-3 py-2 flex items-start gap-2 text-xs">
+                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-extrabold uppercase bg-emerald-200 text-emerald-900 dark:bg-emerald-900 dark:text-emerald-200 shrink-0">Catatan PPL</span>
+                <span class="text-slate-700  font-medium">Puaskan minum 2 jam sebelum aplikasi vaksin Gumboro di hari ke-14 agar vaksin terserap serentak oleh seluruh ayam.</span>
+              </div>
+            </div>
+
+          </div>
+          </div>
+
+          <!-- ======================================================== -->
+          <!-- PANEL TAB 4: STOK GUDANG (4 GRAFIK)                      -->
+          <!-- ======================================================== -->
+          <div id="tab-panel-stok" class="tab-panel hidden pt-2 space-y-4">
+            <div class="border-b border-slate-200 pb-2">
+              <h3 class="text-sm font-bold text-slate-900">
+                Manajemen Stok Gudang & Logistik Pakan
+              </h3>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            
+            <!-- Chart 16 -->
+            <div class="bg-white  p-5 rounded-2xl border border-slate-200  shadow-xs space-y-3 flex flex-col justify-between">
+              <div>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-100 text-blue-800  ">Grafik #16 · Line with Threshold Zone</span>
+                <h4 class="text-xs sm:text-sm font-bold text-slate-900  mt-1">16. Sisa Stok Pakan di Kandang (Sak)</h4>
+                <p class="text-[11px] text-slate-500">Garis tangga menunjukkan jumlah karung pakan yang tersisa di gudang kandang tiap hari.</p>
+              </div>
+              <div class="h-64 sm:h-72 w-full"><canvas id="c16_stock"></canvas></div>
+              <div class="pt-2.5 border-t border-slate-100  insight-box">
+                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-extrabold uppercase bg-amber-200/80 text-amber-900   shrink-0">Insight</span>
+                <span class="text-slate-700  font-medium leading-relaxed" id="insight_c16">Sisa stok pakan saat ini adalah 10 sak (500 kg), buffer persediaan berada pada zona aman operasional.</span>
+              </div>
+            </div>
+
+            <!-- Chart 17 -->
+            <div class="bg-white  p-5 rounded-2xl border border-slate-200  shadow-xs space-y-3 flex flex-col justify-between">
+              <div>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-100 text-blue-800  ">Grafik #17 · Clustered Column Chart</span>
+                <h4 class="text-xs sm:text-sm font-bold text-slate-900  mt-1">17. Arus Masuk Pakan vs Pemakaian</h4>
+                <p class="text-[11px] text-slate-500">Total pakan diterima dari PT. MBS (TRM) dibanding yang sudah diberikan ke ayam (ACT).</p>
+              </div>
+              <div class="h-64 sm:h-72 w-full"><canvas id="c17_flow"></canvas></div>
+              <div class="pt-2.5 border-t border-slate-100  insight-box">
+                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-extrabold uppercase bg-amber-200/80 text-amber-900   shrink-0">Insight</span>
+                <span class="text-slate-700  font-medium leading-relaxed" id="insight_c17">Total penerimaan 20 sak (10 sak H-1 + 10 sak H-7), terpakai 9,5 sak; fisik gudang cocok tanpa selisih pakan hilang.</span>
+              </div>
+            </div>
+
+            <!-- Chart 18 -->
+            <div class="bg-white  p-5 rounded-2xl border border-slate-200  shadow-xs space-y-3 flex flex-col justify-between">
+              <div>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-100 text-blue-800  ">Grafik #18 · Waterfall / Floating Bar Chart</span>
+                <h4 class="text-xs sm:text-sm font-bold text-slate-900  mt-1">18. Ketahanan Stok Hari Tersisa</h4>
+                <p class="text-[11px] text-slate-500">Estimasi berapa hari lagi pakan akan habis jika pemakaian rata-rata tetap sama.</p>
+              </div>
+              <div class="h-64 sm:h-72 w-full"><canvas id="c18_stockDays"></canvas></div>
+              <div class="pt-2.5 border-t border-slate-100  insight-box">
+                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-extrabold uppercase bg-amber-200/80 text-amber-900   shrink-0">Insight</span>
+                <span class="text-slate-700  font-medium leading-relaxed" id="insight_c18">Pakan tersisa cukup untuk 5,0 hari ke depan; pemesanan kiriman berikutnya disarankan pada hari ke-11.</span>
+              </div>
+            </div>
+
+            <!-- Chart 19 -->
+            <div class="bg-white  p-5 rounded-2xl border border-slate-200  shadow-xs space-y-3 flex flex-col justify-between">
+              <div>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-100 text-blue-800  ">Grafik #19 · Gauge / Semi-Doughnut Chart</span>
+                <h4 class="text-xs sm:text-sm font-bold text-slate-900  mt-1">19. Alokasi Pakan Pre-Starter vs Grower</h4>
+                <p class="text-[11px] text-slate-500">Rasio fase pakan crumble halus (starter) terhadap pakan butiran (grower).</p>
+              </div>
+              <div class="h-64 sm:h-72 w-full flex items-center justify-center"><canvas id="c19_feedType"></canvas></div>
+              <div class="pt-2.5 border-t border-slate-100  insight-box">
+                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-extrabold uppercase bg-amber-200/80 text-amber-900   shrink-0">Insight</span>
+                <span class="text-slate-700  font-medium leading-relaxed" id="insight_c19">Fase Starter berjalan hingga hari ke-14 (~20 sak); transisi ke pakan Grower dimulai bertahap di hari ke-15.</span>
+              </div>
+            </div>
+
+          </div>
+          </div>
+
+          <!-- ======================================================== -->
+          <!-- PANEL TAB 5: PANEN ML (4 GRAFIK)                         -->
+          <!-- ======================================================== -->
+          <div id="tab-panel-panen" class="tab-panel hidden pt-2 space-y-4">
+            <div class="border-b border-slate-200 pb-2 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <h3 class="text-sm font-bold text-slate-900">
+                Prediksi Panen & Analisis Skenario Machine Learning
+              </h3>
+
+              <!-- Slider Umur Panen -->
+              <div class="bg-white px-3 py-1.5 rounded-xl border border-slate-200 flex items-center gap-2 text-xs shrink-0 shadow-xs">
+                <span class="font-bold text-slate-700">Target Umur:</span>
+                <input type="range" id="panenAgeSlider" min="28" max="42" value="35" oninput="onHarvestAgeSliderChange(this.value)" class="w-24 sm:w-28 accent-[#84532b] cursor-pointer">
+                <span class="font-extrabold text-[#84532b] text-xs"><span id="sliderAgeText">35</span> Hari</span>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            
+            <!-- Chart 20 -->
+            <div class="bg-white  p-5 rounded-2xl border border-slate-200  shadow-xs space-y-3 flex flex-col justify-between">
+              <div>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-indigo-100 text-indigo-800  ">Grafik #20 · Confidence Band Line Chart</span>
+                <h4 class="text-xs sm:text-sm font-bold text-slate-900  mt-1">20. Proyeksi Pertumbuhan Bobot Panen (H1–H42)</h4>
+                <p class="text-[11px] text-slate-500">Garis putus-putus meramalkan berat ayam hingga panen (~2.031 g di umur 35 hari).</p>
+              </div>
+              <div class="h-64 sm:h-72 w-full"><canvas id="c20_projBw"></canvas></div>
+              <div class="pt-2.5 border-t border-slate-100  insight-box">
+                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-extrabold uppercase bg-amber-200/80 text-amber-900   shrink-0">Insight</span>
+                <span class="text-slate-700  font-medium leading-relaxed" id="insight_c20">Proyeksi pertumbuhan menargetkan bobot 2.031g di hari ke-35 dan mencapai 2.610g jika dipelihara hingga hari ke-40.</span>
+              </div>
+            </div>
+
+            <!-- Chart 21 -->
+            <div class="bg-white  p-5 rounded-2xl border border-slate-200  shadow-xs space-y-3 flex flex-col justify-between">
+              <div>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-indigo-100 text-indigo-800  ">Grafik #21 · Forecast Trajectory Line</span>
+                <h4 class="text-xs sm:text-sm font-bold text-slate-900  mt-1">21. Proyeksi Pergerakan FCR Akhir Hingga Masa Panen</h4>
+                <p class="text-[11px] text-slate-500">Mencari umur panen yang menghasilkan keuntungan tertinggi (skor IP tertinggi).</p>
+              </div>
+              <div class="h-64 sm:h-72 w-full"><canvas id="c21_ipMatrix"></canvas></div>
+              <div class="pt-2.5 border-t border-slate-100  insight-box">
+                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-extrabold uppercase bg-amber-200/80 text-amber-900   shrink-0">Insight</span>
+                <span class="text-slate-700  font-medium leading-relaxed" id="insight_c21">Skor Indeks Performa (IP) tertinggi (IP 388–418) dicapai pada opsi panen di rentang umur 32–35 hari.</span>
+              </div>
+            </div>
+
+            <!-- Chart 22 -->
+            <div class="bg-white  p-5 rounded-2xl border border-slate-200  shadow-xs space-y-3 flex flex-col justify-between">
+              <div>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-indigo-100 text-indigo-800  ">Grafik #22 · Bullet / Target Bar Chart</span>
+                <h4 class="text-xs sm:text-sm font-bold text-slate-900  mt-1">22. Estimasi Tonase Panen (Kg) Terhadap Target Kontrak</h4>
+                <p class="text-[11px] text-slate-500">Berapa biaya pakan untuk menghasilkan 1 kg ayam pada tiap umur panen.</p>
+              </div>
+              <div class="h-64 sm:h-72 w-full"><canvas id="c22_feedCostKg"></canvas></div>
+              <div class="pt-2.5 border-t border-slate-100  insight-box">
+                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-extrabold uppercase bg-amber-200/80 text-amber-900   shrink-0">Insight</span>
+                <span class="text-slate-700  font-medium leading-relaxed" id="insight_c22">Biaya pakan hidup diproyeksikan berkisar Rp 14.365/kg pada hari ke-35, menjaga margin laba mitra tetap optimal.</span>
+              </div>
+            </div>
+
+            <!-- Chart 23 -->
+            <div class="bg-white  p-5 rounded-2xl border border-slate-200  shadow-xs space-y-3 flex flex-col justify-between">
+              <div>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-indigo-100 text-indigo-800  ">Grafik #23 · Multi-Scenario Bar Chart</span>
+                <h4 class="text-xs sm:text-sm font-bold text-slate-900  mt-1">23. Simulasi Perbandingan Panen Dini (H35), Normal (H40), & Maksimal (H42)</h4>
+                <p class="text-[11px] text-slate-500">Perbandingan hasil jika kondisi Optimis (hijau), Realistis (cokelat), atau Pesimis (merah).</p>
+              </div>
+              <div class="h-64 sm:h-72 w-full"><canvas id="c23_scenarios"></canvas></div>
+              <div class="pt-2.5 border-t border-slate-100  insight-box">
+                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-extrabold uppercase bg-amber-200/80 text-amber-900   shrink-0">Insight</span>
+                <span class="text-slate-700  font-medium leading-relaxed" id="insight_c23">Skenario realistis memperkirakan kebutuhan pakan total ~140 sak dengan omzet biomassa hidup 4,92 ton.</span>
+              </div>
+            </div>
+
+          </div>
+          </div>
+
+          <!-- ======================================================== -->
+          <!-- PANEL TAB 6: SIKLUS (2 GRAFIK)                           -->
+          <!-- ======================================================== -->
+          <div id="tab-panel-siklus" class="tab-panel hidden pt-2 space-y-4">
+            <div class="border-b border-slate-200 pb-2">
+              <h3 class="text-sm font-bold text-slate-900">
+                Evaluasi Siklus Historis & Komparasi Antar-Periode
+              </h3>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            
+            <!-- Chart 24 -->
+            <div class="bg-white  p-5 rounded-2xl border border-slate-200  shadow-xs space-y-3 flex flex-col justify-between">
+              <div>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-100 text-emerald-800  ">Grafik #24 · Radar Chart</span>
+                <h4 class="text-xs sm:text-sm font-bold text-slate-900  mt-1">24. Evaluasi Kinerja Multi-Parameter Antar-Periode</h4>
+                <p class="text-[11px] text-slate-500">Melihat apakah periode saat ini lebih hemat pakan dibanding periode-periode lalu.</p>
+              </div>
+              <div class="h-64 sm:h-72 w-full"><canvas id="c24_cycleFcr"></canvas></div>
+              <div class="pt-2.5 border-t border-slate-100  insight-box">
+                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-extrabold uppercase bg-amber-200/80 text-amber-900   shrink-0">Insight</span>
+                <span class="text-slate-700  font-medium leading-relaxed" id="insight_c24">FCR Periode 1 (proyeksi 1,43) menunjukkan efisiensi terbaik dibanding siklus Oktober (1,45) dan Juli (1,49).</span>
+              </div>
+            </div>
+
+            <!-- Chart 25 -->
+            <div class="bg-white  p-5 rounded-2xl border border-slate-200  shadow-xs space-y-3 flex flex-col justify-between">
+              <div>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-100 text-emerald-800  ">Grafik #25 · Lollipop / Bar & Target Line Chart</span>
+                <h4 class="text-xs sm:text-sm font-bold text-slate-900  mt-1">25. Perbandingan Skor Keberhasilan (IP) Antar-Periode</h4>
+                <p class="text-[11px] text-slate-500">Mengevaluasi tren keberhasilan peternakan mitra dari waktu ke waktu.</p>
+              </div>
+              <div class="h-64 sm:h-72 w-full"><canvas id="c25_cycleIp"></canvas></div>
+              <div class="pt-2.5 border-t border-slate-100  insight-box">
+                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-extrabold uppercase bg-amber-200/80 text-amber-900   shrink-0">Insight</span>
+                <span class="text-slate-700  font-medium leading-relaxed" id="insight_c25">Indeks Performa (IP 388) berada pada kategori Baik dan stabil di atas rata-rata mitra se-Kabupaten Sigi.</span>
+              </div>
+            </div>
+
+          </div>
+          </div>
+
+        </section>
+
+        <!-- ======================================================== -->
+        <!-- VIEW 2: PENCATATAN LEMBAR 42 HARI (DIGITAL RECORDING SHEET) -->
+        <!-- ======================================================== -->
+        <section id="view-input" class="content-view hidden space-y-6">
+          <div class="border-b border-slate-200 dark:border-slate-800 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <h2 class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <span>📋</span> Lembar Pencatatan Harian PPL PT. MBS (Hari 1–42)
+              </h2>
+              <p class="text-xs text-slate-500">Mendigitalkan 6 blok mingguan lembar recording fisik di kandang Marawola</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <span id="saveStatusIndicator" class="text-xs font-semibold text-emerald-600 bg-emerald-50 dark:bg-emerald-950/40 px-2.5 py-1.5 rounded-lg border border-emerald-200 dark:border-emerald-800">
+                ✓ Tersimpan otomatis
+              </span>
+            </div>
+          </div>
+
+          <div id="recordingSheetContainer" class="space-y-4"></div>
+
+          <!-- Opsi Backup / Restore -->
+          <div class="p-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl flex flex-wrap items-center gap-2 text-xs">
+            <button onclick="exportToJSON()" class="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 font-medium">Backup File (JSON)</button>
+            <label class="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 font-medium cursor-pointer">
+              Buka Backup (JSON)
+              <input type="file" accept=".json" onchange="importFromJSON(event)" class="hidden">
+            </label>
+            <button onclick="exportToCSV()" class="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 font-medium">Ekspor Excel (CSV)</button>
+            <button onclick="resetToInitialDataPrompt()" class="px-3 py-1.5 rounded-lg text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 font-semibold">Reset ke Awal</button>
+          </div>
+        </section>
+
+      </main>
+
+    </div>
+
+  </div>
+
+  <!-- SCRIPT MODULAR APLIKASI -->
+  <script src="assets/js/data.js?v=2.1"></script>
+  <script src="assets/js/analytics.js?v=2.1"></script>
+  <script src="assets/js/charts.js?v=2.1"></script>
+  <script src="assets/js/app.js?v=2.1"></script>
+</body>
+</html>

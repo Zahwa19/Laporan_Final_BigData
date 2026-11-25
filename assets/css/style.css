@@ -1,0 +1,263 @@
+/**
+ * PT. MAYSURA BERKAH SEJAHTERA - BROILER DASHBOARD
+ * assets/css/style.css
+ * 
+ * Tema Terang Hangat:
+ * - Aksen Cokelat Tanah / Hangat: #78350F / #84532b (Tombol Aktif, Highlight)
+ * - Hijau Emerald: #059669 (Indikator Positif, Standar Baik)
+ * - Kartu Putih Bersih dengan Border Halus
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+:root {
+  --brand-primary: #84532b;
+  --brand-hover: #6e4321;
+  --brand-light: #fef3c7;
+  --brand-glow: rgba(132, 83, 43, 0.22);
+  --emerald-primary: #059669;
+  --emerald-light: #ecfdf5;
+}
+
+/* Aturan Utama Display Hidden */
+.hidden {
+  display: none !important;
+}
+
+#portalLoginView.hidden {
+  display: none !important;
+}
+
+#mainAppLayout.hidden {
+  display: none !important;
+}
+
+body {
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #FAF8F5;
+  color: #1e293b;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+.font-mono {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* Scrollbar Halus */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* ========================================================= */
+/* TATA LETAK UTAMA (ANTI-COLLAPSE: LEBAR PENUH & KOKOH)     */
+/* ========================================================= */
+#mainAppLayout {
+  display: flex !important;
+  flex-direction: row !important;
+  width: 100% !important;
+  min-height: 100vh !important;
+  background-color: #FAF8F5 !important;
+  box-sizing: border-box !important;
+}
+
+#sidebarNav {
+  width: 260px !important;
+  min-width: 260px !important;
+  max-width: 260px !important;
+  flex-shrink: 0 !important;
+  background-color: #ffffff !important;
+  border-right: 1px solid #e2e8f0 !important;
+  height: 100vh !important;
+  position: sticky !important;
+  top: 0 !important;
+  overflow-y: auto !important;
+  z-index: 40 !important;
+  box-sizing: border-box !important;
+}
+
+.main-content-wrapper {
+  flex: 1 1 0% !important;
+  min-width: 0 !important;
+  width: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  background-color: #FAF8F5 !important;
+  box-sizing: border-box !important;
+  overflow-x: hidden !important;
+}
+
+.main-content-wrapper > main {
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+/* Responsive Tablet/Mobile untuk Sidebar */
+@media (max-width: 768px) {
+  #mainAppLayout {
+    flex-direction: column !important;
+  }
+  #sidebarNav {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    position: relative !important;
+  }
+}
+
+/* Sidebar Active & Navigation (Cokelat Hangat #84532b) */
+.sidebar-item-active {
+  background-color: var(--brand-primary) !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 14px rgba(132, 83, 43, 0.28);
+}
+
+.sidebar-item-active svg,
+.sidebar-item-active span {
+  color: #ffffff !important;
+}
+
+.sidebar-nav-btn {
+  transition: all 0.15s ease-in-out;
+}
+
+/* Tab Switcher Buttons untuk 25 Grafik */
+.chart-tab-btn {
+  padding: 0.5rem 1.15rem;
+  border-radius: 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border: 1px solid #e2e8f0;
+  background-color: #ffffff;
+  color: #475569;
+  transition: all 0.15s ease-in-out;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.chart-tab-btn:hover {
+  background-color: #f8fafc;
+  border-color: #cbd5e1;
+  color: #1e293b;
+}
+
+.chart-tab-btn.active-tab {
+  background-color: var(--brand-primary) !important;
+  border-color: var(--brand-primary) !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 8px rgba(132, 83, 43, 0.28) !important;
+}
+
+/* Container Canvas Chart dengan Tinggi Tetap 280px */
+.chart-container {
+  position: relative !important;
+  height: 280px !important;
+  min-height: 280px !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
+}
+
+.chart-container canvas {
+  display: block !important;
+  width: 100% !important;
+  height: 280px !important;
+  max-height: 280px !important;
+}
+
+/* Kartu Grafik Responsif */
+.chart-card {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 1rem;
+  padding: 1.25rem;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 0.75rem;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.chart-card:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 6px 18px -3px rgba(0, 0, 0, 0.05);
+}
+
+/* Kotak Insight Hangat & Korporat */
+.insight-box {
+  background-color: rgba(254, 243, 199, 0.7);
+  border-top: 1px solid rgba(253, 230, 138, 0.6);
+  border-radius: 0.75rem;
+  padding: 0.625rem 0.875rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+/* Kartu KPI Utama */
+.kpi-card {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 1rem;
+  padding: 1rem 1.15rem;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  transition: border-color 0.15s ease, transform 0.15s ease;
+}
+
+.kpi-card:hover {
+  border-color: #cbd5e1;
+  transform: translateY(-1px);
+}
+
+/* Highlight Input pada Recording Sheet */
+.recording-cell-input:focus {
+  outline: none;
+  border-color: var(--brand-primary);
+  box-shadow: 0 0 0 2px rgba(132, 83, 43, 0.2);
+}
+
+/* Print Stylesheet */
+@media print {
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+    font-size: 10pt;
+  }
+  .no-print {
+    display: none !important;
+  }
+  #portalLoginView {
+    display: none !important;
+  }
+  #mainAppLayout {
+    display: block !important;
+  }
+  #sidebarNav {
+    display: none !important;
+  }
+  .main-content-wrapper {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+}
